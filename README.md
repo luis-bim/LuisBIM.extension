@@ -8,14 +8,13 @@ www.linkedin.com/in/luiseduardomaia<br>
 ![Print da barra de tarefas](Assets/ToolBarPrint.png)
 
 # Para que serve?
-Automações de modelagem:<br>
--Adicionar revestimentos de ambientes<br>
--Adicionar soleiras em portas<br>
--Mudar fases de construção<br>
--Criar detalhes de portas e janelas<br>
-<br>
-Centralização de documentos:<br>
--Links para tutoriais de modelage, BIM mandate, templates, etc.
+Automações de modelagem:
+* Adicionar revestimentos de ambientes
+* Adicionar soleiras em portas
+
+Centralização de documentos:
+* Links para tutoriais de modelagem, BIM mandate, etc.
+* Links para templates e bibliotecas.
 
 # Como instalar e usar?
 O primeiro passo é instalar o pyRevit:https://github.com/eirannejad/pyRevit/releases
