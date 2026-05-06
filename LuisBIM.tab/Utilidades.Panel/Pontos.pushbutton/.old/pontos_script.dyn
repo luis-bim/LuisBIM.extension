@@ -1,0 +1,220 @@
+{
+  "Uuid": "26c25a68-cdcb-4fec-905f-cb8252398cae",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "pontos_script",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "# -*- coding: utf-8 -*-\r\n\r\n# Importar bibliotecas comuns (Common Language Runtime)\r\nimport clr\r\n\r\n# Importar APIs do Revit\r\nclr.AddReference('RevitAPI')\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Importar bibliotecas do .NET para criar listas de IDs\r\nimport System\r\nfrom System.Collections.Generic import List\r\n\r\n# Importar serviços do Revit (para acesso ao Documento no Dynamo)\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\n\r\n# Obter o documento e a interface de usuário (UI) do documento atual\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument\r\n\r\n# Inicializar a variável que armazenará o Ponto Base\r\nproject_base_point = None\r\n\r\n# --- Lógica Principal ---\r\n\r\n# 1. Criar um coletor de elementos no documento\r\ncollector = FilteredElementCollector(doc)\r\n\r\n# 2. Filtrar o coletor para encontrar apenas elementos da classe 'BasePoint'\r\n#    Isso inclui tanto o Ponto Base do Projeto quanto o Ponto de Vistoria (Survey Point)\r\nall_base_points = collector.OfClass(BasePoint).ToElements()\r\n\r\n# 3. Iterar pelos BasePoints encontrados\r\nfor bp in all_base_points:\r\n    # O Ponto Base do Projeto (PBP) é o 'BasePoint' cuja propriedade 'IsShared' é False.\r\n    # O Ponto de Vistoria (Survey Point) teria 'IsShared' == True.\r\n    if not bp.IsShared:\r\n        project_base_point = bp\r\n        break # Encontramos o que queríamos, podemos parar o loop\r\n\r\n# --- Saída e Seleção ---\r\n\r\nif project_base_point:\r\n    # 4. Se encontramos o PBP, vamos selecioná-lo na UI\r\n    \r\n    # Criar uma lista .NET de ElementIds\r\n    ids_to_select = List[ElementId]()\r\n    ids_to_select.Add(project_base_point.Id)\r\n    \r\n    # Definir a seleção atual no Revit para destacar o PBP\r\n    # Isso é o mesmo que clicar no elemento\r\n    uidoc.Selection.SetElementIds(ids_to_select)\r\n    \r\n    # 5. Enviar o elemento para a porta de saída (OUT) do nó Python\r\n    OUT = project_base_point\r\nelse:\r\n    # Se, por algum motivo, não for encontrado\r\n    OUT = None",
+      "Engine": "IronPython2",
+      "EngineName": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "68f8c5408a9f4b819d5a3e7b0ad911e8",
+      "Inputs": [
+        {
+          "Id": "3189b1a2ad7f47cc99602e27f989376b",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "8dcfc3dbb7664a3684f3db3dc12b1495",
+          "Name": "OUT",
+          "Description": "Resultado do script Python",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Executa um script Python incorporado."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "# -*- coding: utf-8 -*-\r\n\r\n# Importar bibliotecas comuns (Common Language Runtime)\r\nimport clr\r\n\r\n# Importar APIs do Revit\r\nclr.AddReference('RevitAPI')\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Importar bibliotecas do .NET para criar listas de IDs\r\nimport System\r\nfrom System.Collections.Generic import List\r\n\r\n# Importar serviços do Revit (para acesso ao Documento no Dynamo)\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\n\r\n# Obter o documento e a interface de usuário (UI) do documento atual\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuidoc = DocumentManager.Instance.CurrentUIApplication.ActiveUIDocument\r\n\r\n# Inicializar a variável que armazenará o Ponto de Vistoria\r\nsurvey_point = None\r\n\r\n# --- Lógica Principal ---\r\n\r\n# 1. Criar um coletor de elementos no documento\r\ncollector = FilteredElementCollector(doc)\r\n\r\n# 2. Filtrar o coletor para encontrar apenas elementos da classe 'BasePoint'\r\nall_base_points = collector.OfClass(BasePoint).ToElements()\r\n\r\n# 3. Iterar pelos BasePoints encontrados\r\nfor bp in all_base_points:\r\n    # O Ponto de Vistoria (Survey Point) é o 'BasePoint'\r\n    # cuja propriedade 'IsShared' é True.\r\n    if bp.IsShared:\r\n        survey_point = bp\r\n        break # Encontramos o que queríamos, podemos parar o loop\r\n\r\n# --- Saída e Seleção ---\r\n\r\nif survey_point:\r\n    # 4. Se encontramos o Ponto de Vistoria, vamos selecioná-lo na UI\r\n    \r\n    # Criar uma lista .NET de ElementIds\r\n    ids_to_select = List[ElementId]()\r\n    ids_to_select.Add(survey_point.Id)\r\n    \r\n    # Definir a seleção atual no Revit para destacar o Ponto de Vistoria\r\n    uidoc.Selection.SetElementIds(ids_to_select)\r\n    \r\n    # 5. Enviar o elemento para a porta de saída (OUT) do nó Python\r\n    OUT = survey_point\r\nelse:\r\n    # Se, por algum motivo, não for encontrado\r\n    OUT = None",
+      "Engine": "IronPython2",
+      "EngineName": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "3763f52b199841cda70fd60381f28f61",
+      "Inputs": [
+        {
+          "Id": "a435c5013d544bc9947db4d00665f05d",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "583950b4fc6b42feb6a4c9fa33cd233c",
+          "Name": "OUT",
+          "Description": "Resultado do script Python",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Executa um script Python incorporado."
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "# -*- coding: utf-8 -*-\r\n\r\nimport clr\r\nimport System # Necessário para System.Enum e System.Math\r\n\r\n# --- Importações do Revit e Dynamo ---\r\nclr.AddReference('RevitAPI')\r\nclr.AddReference('RevitAPIUI')\r\nfrom Autodesk.Revit.DB import *\r\n\r\nclr.AddReference('RevitServices')\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager\r\n\r\n# --- Importações Essenciais para WPF ---\r\nclr.AddReference('PresentationFramework')\r\nclr.AddReference('PresentationCore')\r\nclr.AddReference('WindowsBase')\r\nclr.AddReference('System.Xml')\r\n\r\nfrom System.IO import StringReader\r\nfrom System.Xml import XmlReader\r\nfrom System.Windows.Markup import XamlReader\r\nfrom System.Windows import (Window, Thickness, VerticalAlignment, HorizontalAlignment, \r\n                            FontWeights, SizeToContent, TextAlignment) \r\n# --- CORREÇÃO 1: Importar TextBox ---\r\nfrom System.Windows.Controls import (TextBlock, Label, Grid, StackPanel, \r\n                                     GroupBox, Button, TextBox) \r\nfrom System.Windows.Media import Brushes, BrushConverter\r\nfrom System.Globalization import CultureInfo, NumberStyles\r\n\r\n# --- Constantes e Helpers ---\r\nFEET_TO_METERS = 0.3048\r\nPI = System.Math.PI\r\n\r\ndef format_coord_to_br(value_in_feet):\r\n    \"\"\"Converte de pés para metros e formata para o padrão brasileiro (3 casas, vírgula).\"\"\"\r\n    meters = value_in_feet * FEET_TO_METERS\r\n    return meters.ToString(\"N3\", CultureInfo(\"pt-BR\"))\r\n\r\ndef get_param_value_as_formatted_string(element, param_name, is_angle=False):\r\n    \"\"\"Busca o valor numérico, converte (se necessário) e formata com precisão.\"\"\"\r\n    try:\r\n        param = element.LookupParameter(param_name)\r\n        if not param:\r\n            return \"Não encontrado\"\r\n        if is_angle:\r\n            degrees = param.AsDouble() * (180.0 / PI) \r\n            return degrees.ToString(\"N2\", CultureInfo(\"pt-BR\")) + u\"°\" \r\n        value_in_feet = param.AsDouble() \r\n        return format_coord_to_br(value_in_feet) \r\n    except Exception as e:\r\n        return \"Erro: \" + str(e)\r\n\r\n# --- CORREÇÃO 2: Função 'create_cell' modificada ---\r\ndef create_cell(content, row, col, is_header=False, align='Center'):\r\n    \"\"\"Cria um TextBox (selecionável) para ser inserido na Grid WPF.\"\"\"\r\n    \r\n    # 1. Criar um TextBox\r\n    text_box = TextBox()\r\n    text_box.Text = unicode(content)\r\n    \r\n    # 2. Definir alinhamento do texto\r\n    text_box.TextAlignment = System.Enum.Parse(TextAlignment, align)\r\n    \r\n    # 3. Alinhar o conteúdo verticalmente (diferente de TextBlock)\r\n    text_box.VerticalContentAlignment = VerticalAlignment.Center\r\n    \r\n    # 4. Definir espaçamento interno (padding) em vez de externo (margin)\r\n    text_box.Padding = Thickness(5)\r\n    \r\n    # 5. --- A MÁGICA PARA PARECER UM RÓTULO ---\r\n    text_box.IsReadOnly = True      # Não deixa editar\r\n    text_box.BorderThickness = Thickness(0) # Remove a borda\r\n    \r\n    # 6. Definir estilos (como antes)\r\n    if is_header:\r\n        text_box.FontWeight = FontWeights.Bold\r\n        text_box.Background = BrushConverter().ConvertFromString(\"#EEE\")\r\n    else:\r\n        text_box.Background = Brushes.White # Fundo branco padrão da célula\r\n        \r\n    # 7. Adicionar à Grid\r\n    Grid.SetRow(text_box, row)\r\n    Grid.SetColumn(text_box, col)\r\n    return text_box\r\n\r\n# --- Obter Entradas do Dynamo ---\r\ntry:\r\n    wrapped_sp = IN[0]\r\n    wrapped_pbp = IN[1]\r\n    \r\n    doc = DocumentManager.Instance.CurrentDBDocument\r\n\r\n    if not wrapped_sp or not wrapped_pbp:\r\n        raise System.Exception(\"Uma ou ambas as entradas (IN[0], IN[1]) estão vazias (None).\")\r\n    \r\n    sp_element = doc.GetElement(ElementId(wrapped_sp.Id))\r\n    pbp_element = doc.GetElement(ElementId(wrapped_pbp.Id))\r\n    \r\n    if not sp_element or not pbp_element:\r\n        raise System.Exception(\"Falha ao 'desembrulhar' (unwrap) os elementos.\")\r\n\r\n    # --- 1. Extrair Dados: Ponto de Vistoria (SP) ---\r\n    sp_bbox = sp_element.get_BoundingBox(None)\r\n    \r\n    if not sp_bbox:\r\n         raise System.Exception(\"Não foi possível obter a geometria do Ponto de Vistoria (SP).\")\r\n         \r\n    sp_center = (sp_bbox.Min + sp_bbox.Max) / 2.0\r\n    sp_x = format_coord_to_br(sp_center.X)\r\n    sp_y = format_coord_to_br(sp_center.Y)\r\n    sp_z = format_coord_to_br(sp_center.Z)\r\n    \r\n    sp_ns = get_param_value_as_formatted_string(sp_element, \"N/S\")\r\n    sp_lo = get_param_value_as_formatted_string(sp_element, \"L/O\")\r\n    sp_elev = get_param_value_as_formatted_string(sp_element, \"Elev\")\r\n    sp_angle = \"Não se aplica\" \r\n\r\n    # --- 2. Extrair Dados: Ponto Base do Projeto (PBP) ---\r\n    pbp_bbox = pbp_element.get_BoundingBox(None)\r\n    \r\n    if not pbp_bbox:\r\n         raise System.Exception(\"Não foi possível obter a geometria do Ponto Base do Projeto (PBP).\")\r\n         \r\n    pbp_center = (pbp_bbox.Min + pbp_bbox.Max) / 2.0\r\n    pbp_x = format_coord_to_br(pbp_center.X)\r\n    pbp_y = format_coord_to_br(pbp_center.Y)\r\n    pbp_z = format_coord_to_br(pbp_center.Z)\r\n    \r\n    pbp_ns = get_param_value_as_formatted_string(pbp_element, \"N/S\")\r\n    pbp_lo = get_param_value_as_formatted_string(pbp_element, \"L/O\")\r\n    pbp_elev = get_param_value_as_formatted_string(pbp_element, \"Elev\")\r\n    pbp_angle = get_param_value_as_formatted_string(pbp_element, \"Ângulo para norte verdadeiro\", is_angle=True)\r\n\r\nexcept Exception as e:\r\n    OUT = \"Erro ao ler dados dos elementos. Detalhe: \" + str(e)\r\n    raise System.Exception(\"Erro nos inputs: \" + str(e))\r\n\r\n\r\n# --- Definição da Interface (XAML) ---\r\n# (O XAML permanece o mesmo)\r\nxaml_string = \"\"\"\r\n<Window xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"\r\n        xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\"\r\n        Title=\"Coordenadas dos Pontos Base\" \r\n        Width=\"1100\" \r\n        SizeToContent=\"WidthAndHeight\" \r\n        WindowStartupLocation=\"CenterScreen\" \r\n        Topmost=\"True\" \r\n        ResizeMode=\"CanResizeWithGrip\">\r\n    \r\n    <StackPanel Margin=\"15\">\r\n        \r\n        <Grid x:Name=\"dataGrid\" ShowGridLines=\"True\" Margin=\"0,0,0,10\">\r\n            <Grid.ColumnDefinitions>\r\n                <ColumnDefinition Width=\"Auto\" MinWidth=\"260\" /> <ColumnDefinition Width=\"Auto\" MinWidth=\"80\" />  <ColumnDefinition Width=\"Auto\" MinWidth=\"80\" />  <ColumnDefinition Width=\"Auto\" MinWidth=\"80\" />  <ColumnDefinition Width=\"Auto\" MinWidth=\"110\" /> <ColumnDefinition Width=\"Auto\" MinWidth=\"110\" /> <ColumnDefinition Width=\"Auto\" MinWidth=\"110\" /> <ColumnDefinition Width=\"*\" MinWidth=\"150\" />  </Grid.ColumnDefinitions>\r\n            <Grid.RowDefinitions>\r\n                <RowDefinition Height=\"Auto\" /> <RowDefinition Height=\"Auto\" /> <RowDefinition Height=\"Auto\" /> </Grid.RowDefinitions>\r\n        </Grid>\r\n        \r\n        <Button x:Name=\"btnClose\" Content=\"Fechar\" Width=\"100\" HorizontalAlignment=\"Right\" Margin=\"0,10,0,0\" IsDefault=\"True\" />\r\n        \r\n    </StackPanel>\r\n</Window>\r\n\"\"\"\r\n\r\n# --- Lógica da Janela ---\r\n# (Esta seção permanece a mesma)\r\noutput = \"Janela não inicializada.\"\r\n\r\ntry:\r\n    reader = StringReader(xaml_string)\r\n    xml_reader = XmlReader.Create(reader)\r\n    window = XamlReader.Load(xml_reader)\r\n    \r\n    grid = window.FindName(\"dataGrid\")\r\n    \r\n    # --- Linha 0: Headers ---\r\n    grid.Children.Add(create_cell(\"PONTO\", 0, 0, True))\r\n    grid.Children.Add(create_cell(\"X(metros)\", 0, 1, True))\r\n    grid.Children.Add(create_cell(\"Y(metros)\", 0, 2, True))\r\n    grid.Children.Add(create_cell(\"Z(metros)\", 0, 3, True))\r\n    grid.Children.Add(create_cell(\"N/S(metros)\", 0, 4, True))\r\n    grid.Children.Add(create_cell(\"L/O(metros)\", 0, 5, True))\r\n    grid.Children.Add(create_cell(\"ELEV. (metros)\", 0, 6, True))\r\n    grid.Children.Add(create_cell(\"ÂNGULO PARA N. VERDADEIRO (graus)\", 0, 7, True))\r\n    \r\n    # --- Linha 1: Ponto de Vistoria (SP) ---\r\n    grid.Children.Add(create_cell(u\"▲ PONTO DE LEVANTAMENTO TOPOGRÁFICO\", 1, 0, align='Left'))\r\n    grid.Children.Add(create_cell(sp_x, 1, 1, align='Right'))\r\n    grid.Children.Add(create_cell(sp_y, 1, 2, align='Right'))\r\n    grid.Children.Add(create_cell(sp_z, 1, 3, align='Right'))\r\n    grid.Children.Add(create_cell(sp_ns, 1, 4, align='Right'))\r\n    grid.Children.Add(create_cell(sp_lo, 1, 5, align='Right'))\r\n    grid.Children.Add(create_cell(sp_elev, 1, 6, align='Right'))\r\n    grid.Children.Add(create_cell(sp_angle, 1, 7, align='Center'))\r\n    \r\n    # --- Linha 2: Ponto Base do Projeto (PBP) ---\r\n    grid.Children.Add(create_cell(u\"⌖ POTO BASE DO PROJETO\", 2, 0, align='Left'))\r\n    grid.Children.Add(create_cell(pbp_x, 2, 1, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_y, 2, 2, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_z, 2, 3, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_ns, 2, 4, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_lo, 2, 5, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_elev, 2, 6, align='Right'))\r\n    grid.Children.Add(create_cell(pbp_angle, 2, 7, align='Right'))\r\n\r\n    def close_window(sender, e):\r\n        window.Close()\r\n\r\n    close_button = window.FindName(\"btnClose\")\r\n    close_button.Click += close_window\r\n    \r\n    window.ShowDialog()\r\n    \r\n    output = \"Janela exibida e fechada pelo usuário.\"\r\n\r\nexcept Exception as e:\r\n    output = \"Erro ao criar janela WPF: \" + str(e)\r\n\r\nOUT = output",
+      "Engine": "IronPython2",
+      "EngineName": "IronPython2",
+      "VariableInputPorts": true,
+      "Id": "ad1a7048b88543e5b1c4076812bada5b",
+      "Inputs": [
+        {
+          "Id": "4108f631f4ab435bb6e5162a6dbf5965",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "42db248a51ad40fdabe3ca82dec8073b",
+          "Name": "IN[1]",
+          "Description": "Input #1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "9929024b347347fbbec67eff45f6cf6e",
+          "Name": "OUT",
+          "Description": "Resultado do script Python",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Executa um script Python incorporado."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "8dcfc3dbb7664a3684f3db3dc12b1495",
+      "End": "42db248a51ad40fdabe3ca82dec8073b",
+      "Id": "ab317d5780cb41eda05c10ef6f234e63",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "583950b4fc6b42feb6a4c9fa33cd233c",
+      "End": "4108f631f4ab435bb6e5162a6dbf5965",
+      "Id": "674fb3c7457d4b8eaff4359754b5c808",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Propriedades",
+      "Version": "2.17",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "4.0",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "Nenhum",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.17.0.3472",
+      "RunType": "Automatic",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Visualização do plano de fundo",
+      "EyeX": 0.88285374641418457,
+      "EyeY": 4.9012002944946289,
+      "EyeZ": 8.1837329864501953,
+      "LookX": 2.5741989612579346,
+      "LookY": -2.7887163162231445,
+      "LookZ": -12.441964149475098,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "68f8c5408a9f4b819d5a3e7b0ad911e8",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1072.8099134281506,
+        "Y": 1303.8604986612295
+      },
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "3763f52b199841cda70fd60381f28f61",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1069.0779747922636,
+        "Y": 1138.9132170619068
+      },
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "ad1a7048b88543e5b1c4076812bada5b",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1330.7335870040688,
+        "Y": 1180.017162659806
+      }
+    ],
+    "Annotations": [],
+    "X": -724.438222826851,
+    "Y": -837.16753902050687,
+    "Zoom": 0.99770949336202
+  }
+}
