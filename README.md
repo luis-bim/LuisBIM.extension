@@ -1,7 +1,10 @@
 # O que é isso?
 Uma barra de ferramentas para uso com o pyRevit desenvolvida por Luís Eduardo com o intuito de agilizar o processo de modelagem e detalhamento<br>
 Me dmande um Olá se gostou da ideia!<br>
-www.linkedin.com/in/luiseduardomaia
+<br>
+www.linkedin.com/in/luiseduardomaia<br>
+<br>
+
 ![Print da barra de tarefas](Assets/ToolBarPrint.png)
 
 # Para que serve?
