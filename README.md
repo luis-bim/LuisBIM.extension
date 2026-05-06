@@ -1,6 +1,6 @@
 # O que é isso?
 Uma barra de ferramentas para uso com o pyRevit desenvolvida por Luís Eduardo com o intuito de agilizar o processo de modelagem e detalhamento<br>
-Me dmande um Olá se gostou da ideia!<br>
+Me mande um Olá se gostou da ideia!<br>
 <br>
 www.linkedin.com/in/luiseduardomaia<br>
 <br>
@@ -21,5 +21,5 @@ Centralização de documentos:<br>
 O primeiro passo é instalar o pyRevit:https://github.com/eirannejad/pyRevit/releases
 
 Após essa instalação é necessário clonar esse repostorio e inserir ele no seu pyRevit<br>
-Alguns ajustes nos codigos serão necessários para se adequar ao seu padrão de organização. Em breve mais detalhes sobre esse processo.
+Alguns ajustes nos códigos serão necessários para se adequar ao seu padrão de organização. Em breve mais detalhes sobre esse processo.
 
