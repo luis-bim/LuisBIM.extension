@@ -1,6 +1,6 @@
 # O que é isso?
 Uma barra de ferramentas para uso com o pyRevit desenvolvida por Luís Eduardo com o intuito de agilizar o processo de modelagem e detalhamento<br>
-Me mande um Olá se gostou da ideia!<br>
+Me mande um olá se gostou da ideia!<br>
 <br>
 www.linkedin.com/in/luiseduardomaia<br>
 <br>
